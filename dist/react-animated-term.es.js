@@ -71,7 +71,7 @@ var Terminal = function Terminal(_ref) {
     { className: getWindowStyle(white) },
     React.createElement(
       'div',
-      { className: getTerminalStyle(code, height) },
+      { className: getTerminalStyle(code), style: height ? { height: height } : null },
       React.createElement(
         'div',
         { className: 'Terminal-header' },
@@ -428,6 +428,29 @@ var Renderer = function (_React$Component) {
     key: 'componentWillUnmount',
     value: function componentWillUnmount() {
       clearInterval(this.timer);
+    }
+  }, {
+    key: 'componentDidUpdate',
+    value: function componentDidUpdate(prevProps) {
+      var _this3 = this;
+
+      if (JSON.stringify(prevProps.lines) !== JSON.stringify(this.props.lines)) {
+        clearInterval(this.timer);
+        this.content = terminalContent(this.props.lines);
+
+        this.timer = setInterval(function () {
+          var _content$next2 = _this3.content.next(),
+              value = _content$next2.value,
+              done = _content$next2.done;
+
+          _this3.setState({
+            lines: value
+          });
+          if (done) {
+            clearInterval(_this3.timer);
+          }
+        }, this.props.interval);
+      }
     }
   }, {
     key: 'render',
