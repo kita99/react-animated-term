@@ -28,6 +28,23 @@ class Renderer extends React.Component {
     clearInterval(this.timer)
   }
 
+  componentDidUpdate(prevProps) {
+    if(JSON.stringify(prevProps.lines) !== JSON.stringify(this.props.lines)) {
+      clearInterval(this.timer)
+      this.content = termContent(this.props.lines)
+
+      this.timer = setInterval(() => {
+        const { value, done } = this.content.next()
+        this.setState({
+          lines: value
+        })
+        if (done) {
+          clearInterval(this.timer)
+        }
+      }, this.props.interval)
+    }
+  }
+
   render() {
     return (
       <Terminal
